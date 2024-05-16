@@ -12,16 +12,17 @@
 clear all
 set more off
 *Set path to the root of working directory
-    global ccc_root    "/Users/Sebastian/Documents/Papers/Mines/00_Data"
+    global	ccc_cloud   "E:\Box\Research\Synthetic Panel\Peru\ENAHO\Data\ENAHO_1997-2018"
+	global	ccc_git		"E:\GitHub\ENAHO"
 *Set path to folder containing do-files
-    global ccc_dofiles "$ccc_root/Programs/Households/Clean Raw ENAHO"
+    global ccc_dofiles "${ccc_git}/Clean Raw ENAHO"
+*Set path to raw data folder
+    global ccc_in      "${ccc_cloud}"
 *Set path to output folder
-    global ccc_in      "$ccc_root/Enaho/in/Raw Data"
-*Set path to output folder
-    global ccc_out     "$ccc_root/Enaho/out"
+    global ccc_out     "${ccc_git}/Out"
 
 *Runtime: around 1.2 minutes
-cd "$ccc_root"
+cd "${ccc_git}"
 
 timer on 1
 foreach i in 1 2 3 5{

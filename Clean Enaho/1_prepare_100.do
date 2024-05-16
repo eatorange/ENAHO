@@ -9,22 +9,33 @@ forvalues yy = 1997/2018 {
 	*Renames based on survey's official documentation
 	if `yy' == 1997 {
 	    use "$ccc_in/module 01/`yy'/`yy'.dta", clear
-		rename s1con conglome
+		
+		*	Identification variables
+		rename s1con conglome	//	conglomerate (cluster). Accoding to 2021 tech document, it serves as a secondary sampling unit (SSU). In non-panel sample, same conglomerates are visited but different dwellings are surveyed.
 		rename s1viv vivienda
 		rename s1hog hogar
 		
-		rename ubi      ubigeo
+		*	Regional variables
+		rename ubi      ubigeo	//	Geocode, 2-digit region, 2-digit province and 2-digit district
 		rename resencue resultado
+		rename estrato	town_size
 		
-		rename abasagua p110
-		rename serhigie p111
-		rename tienfono p1141
+		*	Survey information
+		
+		* fecentre	//	survey date. 6-digit number
+		* periodo		//	survey execution period, varies from 1 (first period) to 5 (5th period) or 6 (6th period), depending on years. Not sure what it means
+		* resencue // survey result
+		lab	define	survey_result	1	"Complete"	2	"Incomplete"	3	"Rejected"	4	"Vacant"	5	"Absent"	6	"House under construction"	7	"NOT housing"	8	"Don't know"	9	"Other"
+		
+		rename abasagua p110	// water
+		rename serhigie p111	//	sanitation.
+		rename tienfono p1141 // have a phone
 		rename tiencelu p1142
 		rename alumbra1 p1121
 		
-		rename tipvivie p101
-		rename matpared p102
-		rename matpiso  p103
+		rename tipvivie p101 //	Housing type
+		rename matpared p102 // house has wall
+		rename matpiso  p103 // floor material
 		rename tothabit p104
 		rename tenenviv p105a
 		rename alqmens1 p105b
@@ -38,15 +49,15 @@ forvalues yy = 1997/2018 {
 		rename fecentre date
 		}	
 	else if `yy' == 1998 {
-	    local use_vars `key_vars' `raw_tokeep' p110 p111 p1121 p1141 p1142 estrato dominio result*  ubigeo
+	    local use_vars `key_vars' `raw_tokeep' p110 p111 p1121 p1141 p1142 town_size dominio result*  ubigeo
 	    use `use_vars' using "$ccc_in/module 01/`yy'/`yy'.dta", clear
 		}
 	else if `yy' == 2001 {
-	    local use_vars `key_vars' `raw_tokeep' p110 p111 p1121 p1141 p1142 estrato dominio result*  ubigeo fecha
+	    local use_vars `key_vars' `raw_tokeep' p110 p111 p1121 p1141 p1142 town_size dominio result*  ubigeo fecha
 	    use `use_vars' using "$ccc_in/module 01/`yy'/`yy'.dta", clear
 		}
 	else {
-	    local use_vars `key_vars' `raw_tokeep' p110 p111 p1121 p1141 p1142 estrato dominio result*  ubigeo fecent*
+	    local use_vars `key_vars' `raw_tokeep' p110 p111 p1121 p1141 p1142 town_size dominio result*  ubigeo fecent*
 	    use `use_vars' using "$ccc_in/module 01/`yy'/`yy'.dta", clear
 		}
 	gen year = `yy'	
@@ -78,20 +89,17 @@ forvalues yy = 1997/2018 {
 	replace phone = . if p1141==. | p1142==.
 	
 	
-	*town_size variable "estrato" does not have stable levels across the full 1997-2018 period
+	*town_size variable "estrato" (town_size) does not have stable levels across the full 1997-2018 period
 	*solution: follow Aragon & Rud (AEJ:EP 2013) for 1997-2015 (note that they classify towns with 400 pop or less as "urban")
 	*on 2016 coding of the variable changed, so must write code for 2016-2018; here we prioritize comparability across years
 	
 	if `yy' <= 2000 {
-		rename estrato town_size
 		recode town_size 1=5 2=4 3=3 4=2 5=1
 	    }
 	if `yy' >= 2001 & `yy' <= 2015 {
-		rename estrato town_size
 		recode town_size 1=5 2=5 3=4 4=4 5=3 6=3 7=2 8=1
 	    }
 	if `yy' >= 2016 {
-		rename estrato town_size
 		recode town_size 1=5 2=5 3=5 4=5 5=4 6=3 7=2 8=1
 	    }
 	*note that these categories don't necessarily hold outside 2002-2015 period 
